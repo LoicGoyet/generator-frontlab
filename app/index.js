@@ -53,6 +53,13 @@ module.exports = generators.Base.extend({
             );
         }
 
+        // Create .gitignore
+        // -----------------
+        this.fs.copyTpl(
+            this.templatePath('_gitignore'),
+            this.destinationPath('.gitignore')
+        );
+
         // Create gulpfile
         // ---------------
         this.fs.copyTpl(
