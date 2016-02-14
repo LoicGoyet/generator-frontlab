@@ -53,11 +53,15 @@ module.exports = generators.Base.extend({
             );
         }
 
-        // Create .gitignore
+        // Create dotfiles
         // -----------------
         this.fs.copyTpl(
             this.templatePath('_gitignore'),
             this.destinationPath('.gitignore')
+        );
+        this.fs.copyTpl(
+            this.templatePath('_scss-lint.yml'),
+            this.destinationPath('.scss-lint.yml')
         );
 
         // Create gulpfile
