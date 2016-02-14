@@ -1,25 +1,48 @@
 @charset 'UTF-8';
 
-// 1. Configuration and helpers
-@import 'utils/utils';
+/**
+ * Configuration and helpers
+ */
+@import 'utils/variables';
+@import 'utils/functions';
+@import 'utils/mixins';
+// END utils
 
-// 2. Vendors
-@import 'vendor/vendor';
+/**
+ * Vendors
+ */
+// END vendors
 
-// 3. Base stuff
-@import 'base/base';
+/**
+ * Base stuff
+ */
+@import 'base/basic';
+@import 'base/fonts';
+@import 'base/typography';
+@import 'base/helpers';
+// END base
 
-// 4. Layout-related sections
-@import 'layout/layout';
+/**
+ * Layout-related sections
+ */
+// END layout
 
-// 5. Components
-@import 'components/components';
+/**
+ * Components
+ */
+// END components
 
-// 6. Page-specific styles
-@import 'pages/pages';
+/**
+ * Page-specific styles
+ */
+// END pages
 
-// 7. Themes
-@import 'themes/themes';
+/**
+ * Themes
+ */
+// END themes
 
-// 8. Shame
+/**
+ * Shame
+ */
 @import 'shame';

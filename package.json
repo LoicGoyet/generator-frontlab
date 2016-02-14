@@ -4,7 +4,8 @@
   "description": "Yeoman generator for front-end workflow",
   "files": [
     "app",
-    "router"
+    "router",
+    "style-partial"
   ],
   "keywords": [
     "yeoman-generator"
