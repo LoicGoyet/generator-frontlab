@@ -47,7 +47,7 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'twig_src',
                 message: 'Where do you want to generate the twig architecture ?',
-                default: 'dest',
+                default: 'src',
                 when: function(answers) {
                     return answers.twig_enabled;
                 },
@@ -69,6 +69,23 @@ module.exports = generators.Base.extend({
                     return answers.twig_enabled;
                 },
             },
+            {
+                type: 'input',
+                name: 'twig_dest',
+                message: 'Where will be generated the html files after compilation ?',
+                default: 'dest',
+                when: function(answers) {
+                    return answers.twig_enabled && answers.twig_compilation;
+                },
+                validate: function(input) {
+                    if (typeof input !== 'string' || input.length === 0) {
+                        this.log(chalk.red('You must pass a valid string valid !'));
+                        return false;
+                    }
+
+                    return true;
+                }.bind(this),
+            }
         ], function(answers) {
             // Sass anwsers
             this.config.sass.src = answers.sass_src + '/style';
@@ -76,8 +93,9 @@ module.exports = generators.Base.extend({
 
             // Twig anwsers
             this.config.twig.enabled = answers.twig_enabled;
-            this.config.twig.src = answers.twig_enabled ? answers.twig_src : false;
+            this.config.twig.src = answers.twig_enabled ? answers.twig_src + '/templates' : false;
             this.config.twig.compilation = answers.twig_enabled ? answers.twig_compilation : false;
+            this.config.twig.dest = answers.twig_enabled && this.config.twig.compilation ? answers.twig_dest : false;
             done();
         }.bind(this));
     },
@@ -114,7 +132,8 @@ module.exports = generators.Base.extend({
         // ---------------
         this.fs.copyTpl(
             this.templatePath('gulpfile.js'),
-            this.destinationPath('gulpfile.js')
+            this.destinationPath('gulpfile.js'),
+            { config: this.config }
         );
 
         // Create sass files
@@ -123,10 +142,20 @@ module.exports = generators.Base.extend({
             this.templatePath('sass'),
             this.destinationPath(this.config.sass.src)
         );
+
+        // Create twig files
+        // -----------------
+        if (this.config.twig.enabled) {
+            this.fs.copyTpl(
+                this.templatePath('templates'),
+                this.destinationPath(this.config.twig.src)
+            );
+        }
     },
 
     install: function() {
         this.npmInstall(['gulp'], { 'saveDev': true });
+        this.npmInstall(['gulp-size'], { 'saveDev': true });
         this.npmInstall(['gulp-load-plugins'], { 'saveDev': true });
         this.npmInstall(['fs-extra'], { 'saveDev': true });
 
@@ -134,6 +163,10 @@ module.exports = generators.Base.extend({
         this.npmInstall(['gulp-sourcemaps'], { 'saveDev': true });
         this.npmInstall(['gulp-sass'], { 'saveDev': true });
         this.npmInstall(['gulp-autoprefixer'], { 'saveDev': true });
-        this.npmInstall(['gulp-size'], { 'saveDev': true });
+
+        // Gulp twig dependencies
+        if (this.config.twig.compilation) {
+            this.npmInstall(['gulp-twig'], { 'saveDev': true });
+        }
     },
 });

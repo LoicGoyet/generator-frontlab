@@ -32,3 +32,13 @@ gulp.task('styles', function () {
     .pipe(gulp.dest(config.sass.dest))
     .pipe($.size({title: 'styles'}));
 });
+
+<% if (config.twig.compilation) { %>
+gulp.task('twig', function() {
+    var config = getConfig();
+    return gulp.src(config.twig.src + '/*.html.twig')
+        .pipe($.twig())
+        .pipe(gulp.dest(config.twig.dest))
+        .pipe($.size({title: 'twig'}));
+});
+<% } %>

@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% block stylesheets %}
+            <link rel="stylesheet" href="main.css">
+        {% endblock stylesheets %}
+
+        {% block javascript_top %}{% endblock %}
+    </head>
+
+    <body {% block body_attr %}{% endblock %}>
+        {% block content %}{% endblock %}
+
+        {% block javascript_bottom %}{% endblock %}
+    </body>
+</html>
