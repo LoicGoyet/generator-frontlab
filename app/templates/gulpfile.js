@@ -34,7 +34,7 @@ gulp.task('styles', function () {
 });
 
 <% if (config.twig.compilation) { %>
-gulp.task('twig', function() {
+gulp.task('templates', function() {
     var config = getConfig();
     return gulp.src(config.twig.src + '/*.html.twig')
         .pipe($.twig())
