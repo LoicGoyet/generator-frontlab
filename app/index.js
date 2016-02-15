@@ -1,5 +1,6 @@
 var generators = require('yeoman-generator');
 var fs = require('fs-extra');
+var chalk = require('chalk');
 
 module.exports = generators.Base.extend({
     initializing: function() {
@@ -8,6 +9,10 @@ module.exports = generators.Base.extend({
             sass: {
                 src: '',
                 dest: '',
+            },
+            twig: {
+                enabled: '',
+                compilation: '',
             }
         };
     },
@@ -40,6 +45,55 @@ module.exports = generators.Base.extend({
             this.config.sass.dest = answers.sass_dest;
             done();
         }.bind(this));
+    },
+
+    // Ask template
+    // ============
+    ask_twig: function() {
+        var done = this.async();
+        this.prompt([
+            {
+                type: 'confirm',
+                name: 'twig_enabled',
+                message: 'Do you want to generate twig architecture for faster GUI ?',
+                default: 'true'
+            },
+            {
+                type: 'input',
+                name: 'twig_src',
+                message: 'Where do you want to generate the twig architecture ?',
+                default: 'dest',
+                when: function(answers) {
+                    return answers.twig_enabled;
+                },
+                validate: function(input) {
+                    if (typeof input !== 'string' || input.length === 0) {
+                        this.log(chalk.red('You must pass a valid string valid !'));
+                        return false;
+                    }
+
+                    return true;
+                }.bind(this),
+            },
+            {
+                type: 'confirm',
+                name: 'twig_compilation',
+                message: 'Do you want a gulp task that will compile your twig files ?',
+                default: 'true',
+                when: function(answers) {
+                    return answers.twig_enabled;
+                },
+            },
+        ], function(answers) {
+            this.config.twig.enabled = answers.twig_enabled;
+            this.config.twig.src = answers.twig_enabled ? answers.twig_src : false;
+            this.config.twig.compilation = answers.twig_enabled ? answers.twig_compilation : false;
+            done();
+        }.bind(this));
+    },
+
+    show_config: function() {
+        this.log(this.config);
     },
 
     writing: function() {
@@ -95,8 +149,4 @@ module.exports = generators.Base.extend({
         this.npmInstall(['gulp-autoprefixer'], { 'saveDev': true });
         this.npmInstall(['gulp-size'], { 'saveDev': true });
     },
-
-    end: function() {
-        this.log(this.config);
-    }
 });
