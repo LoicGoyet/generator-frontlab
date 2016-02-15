@@ -47,7 +47,9 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'twig_src',
                 message: 'Where do you want to generate the twig architecture ?',
-                default: 'src',
+                default: function(answers) {
+                    return answers.sass_src;
+                },
                 when: function(answers) {
                     return answers.twig_enabled;
                 },
@@ -73,7 +75,9 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'twig_dest',
                 message: 'Where will be generated the html files after compilation ?',
-                default: 'dest',
+                default: function(answers) {
+                    return answers.sass_dest;
+                },
                 when: function(answers) {
                     return answers.twig_enabled && answers.twig_compilation;
                 },
