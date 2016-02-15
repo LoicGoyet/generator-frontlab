@@ -17,41 +17,26 @@ module.exports = generators.Base.extend({
         };
     },
 
-    // Get sass src
-    // ============
-    ask_sass_src: function() {
-        var done = this.async();
-        this.prompt({
-            type: 'input',
-            name: 'sass_src',
-            message: 'Where do you want to generate the sass architecture ?',
-            default: 'src'
-        }, function(answers) {
-            this.config.sass.src = answers.sass_src + '/style';
-            done();
-        }.bind(this));
-    },
-
-    // Get sass dest
-    // =============
-    ask_sass_dest: function() {
-        var done = this.async();
-        this.prompt({
-            type: 'input',
-            name: 'sass_dest',
-            message: 'Where will be generated the sass files ?',
-            default: 'dest'
-        }, function(answers) {
-            this.config.sass.dest = answers.sass_dest;
-            done();
-        }.bind(this));
-    },
-
-    // Ask template
-    // ============
-    ask_twig: function() {
+    prompting: function() {
         var done = this.async();
         this.prompt([
+            // Sass prompts
+            // ------------
+            {
+                type: 'input',
+                name: 'sass_src',
+                message: 'Where do you want to generate the sass architecture ?',
+                default: 'src'
+            },
+            {
+                type: 'input',
+                name: 'sass_dest',
+                message: 'Where will be generated the sass files ?',
+                default: 'dest'
+            },
+
+            // Twig prompts
+            // ------------
             {
                 type: 'confirm',
                 name: 'twig_enabled',
@@ -85,6 +70,11 @@ module.exports = generators.Base.extend({
                 },
             },
         ], function(answers) {
+            // Sass anwsers
+            this.config.sass.src = answers.sass_src + '/style';
+            this.config.sass.dest = answers.sass_dest;
+
+            // Twig anwsers
             this.config.twig.enabled = answers.twig_enabled;
             this.config.twig.src = answers.twig_enabled ? answers.twig_src : false;
             this.config.twig.compilation = answers.twig_enabled ? answers.twig_compilation : false;
@@ -92,8 +82,10 @@ module.exports = generators.Base.extend({
         }.bind(this));
     },
 
-    show_config: function() {
+    configuring: function() {
         this.log(this.config);
+        var config_str = JSON.stringify(this.config, null, 4);
+        fs.writeFileSync(this.destinationPath('frontlab.json'), config_str);
     },
 
     writing: function() {
@@ -131,11 +123,6 @@ module.exports = generators.Base.extend({
             this.templatePath('sass'),
             this.destinationPath(this.config.sass.src)
         );
-
-        // Create json config
-        // ------------------
-        var config_str = JSON.stringify(this.config, null, 4);
-        fs.writeFileSync(this.destinationPath('frontlab.json'), config_str);
     },
 
     install: function() {
