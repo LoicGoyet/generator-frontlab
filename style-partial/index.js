@@ -65,25 +65,73 @@ module.exports = generators.Base.extend({
             {
                 type: 'input',
                 name: 'name',
-                message: 'What is the name of your partial ?'
-            }
+                message: 'What is the name of your partial ?',
+                default: 'pod',
+                validate: function(input) {
+                    if (typeof input !== 'string' || input.length === 0) {
+                        this.log(chalk.red('You must pass a valid string valid !'));
+                        return false;
+                    }
+
+                    return true;
+                }.bind(this),
+            },
+            {
+                type: 'confirm',
+                name: 'template_gui',
+                message: 'Do you want to generate a template for your guidelines ?',
+                default: function(answers) {
+                    if (['components', 'layout', 'utils'].indexOf(answers.type) >= 0) {
+                        return true;
+                    }
+
+                    return false;
+                }.bind(this),
+            },
+            {
+                type: 'confirm',
+                name: 'template_brick',
+                message: 'Do you want to generate a template reusable into all your templates ?',
+                when: function(answers) {
+                    return answers.template_gui;
+                },
+                default: true,
+            },
         ], function(answers) {
             this.type = answers.type;
             this.name = answers.name;
+            this.template = {
+                gui: answers.template_gui,
+                brick: answers.template_brick,
+            };
             done();
         }.bind(this));
     },
 
     configuring: function() {
-        this.file = this.destinationPath(this.config.sass.src + '/' + this.type + '/_' + this.name + '.scss');
-        this.doGenerate = !fs.existsSync(this.file);
+        this.file = {
+            scss: this.destinationPath(this.config.sass.src + '/' + this.type + '/_' + this.name + '.scss'),
+            twig: this.destinationPath(this.config.twig.src + '/guidelines/' + this.type + '/_' + this.name + '.html.twig')
+        };
+        this.doGenerate = {
+            scss: !fs.existsSync(this.file.scss),
+            twig: !fs.existsSync(this.file.twig),
+        };
     },
 
     writing: function() {
-        if (this.doGenerate) {
-            fs.writeFileSync(this.file, '', 'utf8');
-            this.log(chalk.green('create file : ') + this.file);
+        for (var key in this.file) {
+            if (!this.doGenerate[key]) {
+                this.log(chalk.red('file ') + this.file[key] + chalk.red(' already exists'));
+            }
+        }
 
+        if (this.doGenerate.scss) {
+            // Create scss partial file
+            fs.writeFileSync(this.file.scss, '', 'utf8');
+            this.log(chalk.green('create file : ') + this.file.scss);
+
+            // Import scss partial into main.scss
             var injection = '@import \'' + this.type + '/' + this.name + '\';';
             var flag = '// END ' + this.type;
             var mainSCSSpath = this.destinationPath(this.config.sass.src + '/main.scss');
@@ -91,8 +139,21 @@ module.exports = generators.Base.extend({
             mainSCSS = mainSCSS.replace(flag, injection + '\n' + flag);
             fs.writeFileSync(mainSCSSpath, mainSCSS);
             this.log(chalk.green('import partial into : ') + mainSCSSpath);
-        } else {
-            this.log(chalk.red('file ') + this.file + chalk.red(' already exists'));
+        }
+
+        if (this.doGenerate.twig) {
+            // Create if necessary template partial folder
+            if (!fs.existsSync(this.destinationPath(this.config.twig.src + '/guidelines'))) {
+                fs.mkdirSync(this.destinationPath(this.config.twig.src + '/guidelines'));
+            }
+
+            if (!fs.existsSync(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type))) {
+                fs.mkdirSync(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type));
+            }
+
+            // Create template partial file
+            fs.writeFileSync(this.file.twig, '', 'utf8');
+            this.log(chalk.green('create file : ') + this.file.twig);
         }
     },
 });
