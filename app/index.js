@@ -13,7 +13,8 @@ module.exports = generators.Base.extend({
             twig: {
                 enabled: '',
                 compilation: '',
-            }
+            },
+            serve: false,
         };
     },
 
@@ -89,6 +90,15 @@ module.exports = generators.Base.extend({
 
                     return true;
                 }.bind(this),
+            },
+            {
+                type: 'confirm',
+                name: 'serve',
+                message: 'Do you need a gulp task for having a localserver ?',
+                when: function(answers) {
+                    return answers.twig_compilation;
+                },
+                default: true,
             }
         ], function(answers) {
             // Sass anwsers
@@ -100,6 +110,9 @@ module.exports = generators.Base.extend({
             this.config.twig.src = answers.twig_enabled ? answers.twig_src + '/templates' : false;
             this.config.twig.compilation = answers.twig_enabled ? answers.twig_compilation : false;
             this.config.twig.dest = answers.twig_enabled && this.config.twig.compilation ? answers.twig_dest : false;
+
+            // Server
+            this.config.serve = answers.serve ? answers.serve : false;
             done();
         }.bind(this));
     },
@@ -159,27 +172,34 @@ module.exports = generators.Base.extend({
     },
 
     install: function() {
-        this.npmInstall([
+        var devDependencies = [
             'gulp',
             'gulp-size',
             'gulp-load-plugins',
             'fs-extra',
-        ], { 'saveDev': true });
 
-        // Gulp sass dependencies
-        this.npmInstall([
+            // Gulp sass dependencies
             'gulp-sourcemaps',
             'gulp-sass',
             'gulp-autoprefixer',
-        ], { 'saveDev': true });
+        ];
 
         // Gulp twig dependencies
         if (this.config.twig.compilation) {
-            this.npmInstall([
+            devDependencies.push(
                 'gulp-twig',
                 'gulp-ext-replace',
-                'gulp-prettify',
-            ], { 'saveDev': true });
+                'gulp-prettify'
+            );
         }
+
+        // Gulp serve dependencies
+        if (this.config.serve) {
+            devDependencies.push(
+                'browser-sync'
+            );
+        }
+
+        this.npmInstall(devDependencies, { 'saveDev': true });
     },
 });

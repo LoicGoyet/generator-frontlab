@@ -1,6 +1,8 @@
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var fs = require('fs-extra');
+<% if (config.serve) { %>var browserSync = require('browser-sync');<% } %>
+<% if (config.serve) { %>var reload = browserSync.reload;<% } %>
 
 var getConfig = function() {
     var config_str = fs.readFileSync('frontlab.json');
@@ -33,8 +35,7 @@ gulp.task('styles', function () {
     .pipe($.size({title: 'styles'}));
 });
 
-<% if (config.twig.compilation) { %>
-gulp.task('templates', function() {
+<% if (config.twig.compilation) { %>gulp.task('templates', function() {
     var config = getConfig();
     return gulp.src(config.twig.src + '/*.html.twig')
         .pipe($.twig())
@@ -42,5 +43,17 @@ gulp.task('templates', function() {
         .pipe($.prettify({ indent_size: 2 }))
         .pipe(gulp.dest(config.twig.dest))
         .pipe($.size({title: 'twig'}));
+});<% } %>
+
+gulp.task('watch', ['styles', <% if (config.twig.compilation) { %>'templates',<% } %>], function() {
+    var config = getConfig();
+
+    <% if (config.serve) { %>browserSync({
+        notify: false,
+        logPrefix: 'FrontLab',
+        server: ['.tmp', config.twig.dest]
+    });<% } %>
+
+    gulp.watch(config.sass.src + '/**/*.{scss, css}', ['styles', <% if (config.serve) { %>reload<% } %>]);
+    gulp.watch(config.twig.src + '/**/*.{html.twig, twig}', ['templates', <% if (config.serve) { %>reload<% } %>]);
 });
-<% } %>
