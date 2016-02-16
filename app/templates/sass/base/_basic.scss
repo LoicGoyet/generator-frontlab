@@ -15,6 +15,10 @@ html {
  * making all elements inheriting from the root box-sizing value
  * See: https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
  */
-*, *::before, *::after {
-  box-sizing: inherit;
+* {
+  &,
+  &::before,
+  &::after {
+    box-sizing: inherit;
+  }
 }
