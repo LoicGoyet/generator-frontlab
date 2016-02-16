@@ -128,6 +128,11 @@ module.exports = generators.Base.extend({
             this.destinationPath('.scss-lint.yml')
         );
 
+        this.fs.copyTpl(
+            this.templatePath('_editorconfig'),
+            this.destinationPath('.editorconfig')
+        );
+
         // Create gulpfile
         // ---------------
         this.fs.copyTpl(
