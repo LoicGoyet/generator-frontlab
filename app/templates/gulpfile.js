@@ -35,6 +35,13 @@ gulp.task('styles', function () {
     .pipe($.size({title: 'styles'}));
 });
 
+<% if (config.public.enabled) { %>gulp.task('copy-public', function() {
+    var config = getConfig();
+    return gulp.src(config.public.src + '/public/**/*', { dot: true })
+        .pipe(gulp.dest(config.public.dest + '/public'))
+        .pipe($.size({ title: 'public' }));
+});<% } %>
+
 <% if (config.twig.compilation) { %>gulp.task('templates', function() {
     var config = getConfig();
     return gulp.src(config.twig.src + '/*.html.twig')
@@ -45,7 +52,11 @@ gulp.task('styles', function () {
         .pipe($.size({title: 'twig'}));
 });<% } %>
 
-gulp.task('watch', ['styles', <% if (config.twig.compilation) { %>'templates',<% } %>], function() {
+gulp.task('watch', [
+    'styles',
+    <% if (config.twig.compilation) { %>'templates',<% } %>
+    <% if (config.public.enabled) { %>'copy-public',<% } %>
+], function() {
     var config = getConfig();
 
     <% if (config.serve) { %>browserSync({
@@ -55,5 +66,6 @@ gulp.task('watch', ['styles', <% if (config.twig.compilation) { %>'templates',<%
     });<% } %>
 
     gulp.watch(config.sass.src + '/**/*.{scss, css}', ['styles', <% if (config.serve) { %>reload<% } %>]);
-    gulp.watch(config.twig.src + '/**/*.{html.twig, twig}', ['templates', <% if (config.serve) { %>reload<% } %>]);
+    <% if (config.twig.compilation) { %>gulp.watch(config.twig.src + '/**/*.{html.twig, twig}', ['templates', <% if (config.serve) { %>reload<% } %>]);<% } %>
+    <% if (config.public.enabled) { %>gulp.watch(config.public.src + '/public/**/*', ['copy-public', <% if (config.serve) { %>reload<% } %>]);<% } %>
 });

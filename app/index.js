@@ -14,6 +14,11 @@ module.exports = generators.Base.extend({
                 enabled: '',
                 compilation: '',
             },
+            public: {
+                enabled: '',
+                src: '',
+                dest: '',
+            },
             serve: false,
         };
     },
@@ -99,7 +104,35 @@ module.exports = generators.Base.extend({
                     return answers.twig_compilation;
                 },
                 default: true,
-            }
+            },
+            {
+                type: 'confirm',
+                name: 'public_enabled',
+                message: 'Do you want to generate a \'public\' folder (usefull for copy all files without transformation)',
+                default: true,
+            },
+            {
+                type: 'input',
+                name: 'public_src',
+                message: 'Where do you want to generate the \'public\' folder ?',
+                when: function(answers) {
+                    return answers.public_enabled;
+                },
+                default: function(answers) {
+                    return answers.sass_src;
+                },
+            },
+            {
+                type: 'input',
+                name: 'public_dest',
+                message: 'Where do you want to copy the \'public\' folder ?',
+                when: function(answers) {
+                    return answers.public_enabled;
+                },
+                default: function(answers) {
+                    return answers.sass_dest;
+                },
+            },
         ], function(answers) {
             // Sass anwsers
             this.config.sass.src = answers.sass_src + '/style';
@@ -113,6 +146,11 @@ module.exports = generators.Base.extend({
 
             // Server
             this.config.serve = answers.serve ? answers.serve : false;
+
+            // Copy
+            this.config.public.enabled = answers.public_enabled;
+            this.config.public.src = answers.public_src ? answers.public_src : false;
+            this.config.public.dest = answers.public_dest ? answers.public_dest : false;
             done();
         }.bind(this));
     },
@@ -167,6 +205,15 @@ module.exports = generators.Base.extend({
             this.fs.copyTpl(
                 this.templatePath('templates'),
                 this.destinationPath(this.config.twig.src)
+            );
+        }
+
+        // Create public folder
+        // --------------------
+        if (this.config.public.enabled) {
+            this.fs.copyTpl(
+                this.templatePath('public'),
+                this.destinationPath(this.config.public.src + '/public')
             );
         }
     },
