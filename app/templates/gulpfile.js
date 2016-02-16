@@ -51,7 +51,7 @@ gulp.task('watch', ['styles', <% if (config.twig.compilation) { %>'templates',<%
     <% if (config.serve) { %>browserSync({
         notify: false,
         logPrefix: 'FrontLab',
-        server: ['.tmp', config.twig.dest]
+        server: [config.twig.dest]
     });<% } %>
 
     gulp.watch(config.sass.src + '/**/*.{scss, css}', ['styles', <% if (config.serve) { %>reload<% } %>]);
