@@ -2,6 +2,9 @@ var generators = require('yeoman-generator');
 var fs = require('fs-extra');
 var chalk = require('chalk');
 
+var partialCreation = require('./helper/partial-creation.js')();
+var partialImport = require('./helper/partial-import.js')();
+
 module.exports = generators.Base.extend({
     initializing: function() {
         this.log('Creating style partial');
@@ -128,17 +131,14 @@ module.exports = generators.Base.extend({
 
         if (this.doGenerate.scss) {
             // Create scss partial file
-            fs.writeFileSync(this.file.scss, '', 'utf8');
-            this.log(chalk.green('create file : ') + this.file.scss);
+            partialCreation(this.file.scss);
 
             // Import scss partial into main.scss
-            var injection = '@import \'' + this.type + '/' + this.name + '\';';
-            var flag = '// END ' + this.type;
-            var mainSCSSpath = this.destinationPath(this.config.sass.src + '/main.scss');
-            var mainSCSS = fs.readFileSync(mainSCSSpath, 'utf8');
-            mainSCSS = mainSCSS.replace(flag, injection + '\n' + flag);
-            fs.writeFileSync(mainSCSSpath, mainSCSS);
-            this.log(chalk.green('import partial into : ') + mainSCSSpath);
+            partialImport(
+                '@import \'' + this.type + '/' + this.name + '\';\n', // injection
+                '// END ' + this.type, // flag
+                this.destinationPath(this.config.sass.src + '/main.scss') // path
+            );
         }
 
         if (this.doGenerate.twig) {
@@ -152,8 +152,14 @@ module.exports = generators.Base.extend({
             }
 
             // Create template partial file
-            fs.writeFileSync(this.file.twig, '', 'utf8');
-            this.log(chalk.green('create file : ') + this.file.twig);
+            partialCreation(this.file.twig);
+
+            // Generate guideline template import
+            partialImport(
+                '    {% include \'guidelines/' + this.type + '/_' + this.name + '.html.twig\' %}\n    ', // injection
+                '{% endblock ' + this.type + ' %}', // flag
+                this.destinationPath(this.config.twig.src + '/guidelines.html.twig') // path
+            );
         }
     },
 });
