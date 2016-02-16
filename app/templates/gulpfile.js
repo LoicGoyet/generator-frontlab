@@ -38,6 +38,8 @@ gulp.task('templates', function() {
     var config = getConfig();
     return gulp.src(config.twig.src + '/*.html.twig')
         .pipe($.twig())
+        .pipe($.extReplace('.html', '.html.html'))
+        .pipe($.prettify({ indent_size: 2 }))
         .pipe(gulp.dest(config.twig.dest))
         .pipe($.size({title: 'twig'}));
 });

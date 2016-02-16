@@ -158,19 +158,27 @@ module.exports = generators.Base.extend({
     },
 
     install: function() {
-        this.npmInstall(['gulp'], { 'saveDev': true });
-        this.npmInstall(['gulp-size'], { 'saveDev': true });
-        this.npmInstall(['gulp-load-plugins'], { 'saveDev': true });
-        this.npmInstall(['fs-extra'], { 'saveDev': true });
+        this.npmInstall([
+            'gulp',
+            'gulp-size',
+            'gulp-load-plugins',
+            'fs-extra',
+        ], { 'saveDev': true });
 
         // Gulp sass dependencies
-        this.npmInstall(['gulp-sourcemaps'], { 'saveDev': true });
-        this.npmInstall(['gulp-sass'], { 'saveDev': true });
-        this.npmInstall(['gulp-autoprefixer'], { 'saveDev': true });
+        this.npmInstall([
+            'gulp-sourcemaps',
+            'gulp-sass',
+            'gulp-autoprefixer',
+        ], { 'saveDev': true });
 
         // Gulp twig dependencies
         if (this.config.twig.compilation) {
-            this.npmInstall(['gulp-twig'], { 'saveDev': true });
+            this.npmInstall([
+                'gulp-twig',
+                'gulp-ext-replace',
+                'gulp-prettify',
+            ], { 'saveDev': true });
         }
     },
 });
