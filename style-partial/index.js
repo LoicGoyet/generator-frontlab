@@ -4,6 +4,7 @@ var chalk = require('chalk');
 
 var partialCreation = require('./helper/partial-creation.js')();
 var partialImport = require('./helper/partial-import.js')();
+var folderCreation = require('./helper/folder-creation.js')();
 
 module.exports = generators.Base.extend({
     initializing: function() {
@@ -105,7 +106,7 @@ module.exports = generators.Base.extend({
             this.name = answers.name;
             this.template = {
                 gui: answers.template_gui,
-                brick: answers.template_brick,
+                brick: answers.template_brick ? answers.template_brick : false,
             };
             done();
         }.bind(this));
@@ -114,11 +115,13 @@ module.exports = generators.Base.extend({
     configuring: function() {
         this.file = {
             scss: this.destinationPath(this.config.sass.src + '/' + this.type + '/_' + this.name + '.scss'),
-            twig: this.destinationPath(this.config.twig.src + '/guidelines/' + this.type + '/_' + this.name + '.html.twig')
+            twig: this.destinationPath(this.config.twig.src + '/guidelines/' + this.type + '/_' + this.name + '.html.twig'),
+            twig_brick: this.destinationPath(this.config.twig.src + '/bricks/_' + this.name + '.html.twig'),
         };
         this.doGenerate = {
             scss: !fs.existsSync(this.file.scss),
-            twig: !fs.existsSync(this.file.twig),
+            twig: !fs.existsSync(this.file.twig) && this.template.gui,
+            twig_brick: !fs.existsSync(this.file.twig) && !fs.existsSync(this.file.twig_brick) && this.template.brick,
         };
     },
 
@@ -142,17 +145,14 @@ module.exports = generators.Base.extend({
         }
 
         if (this.doGenerate.twig) {
-            // Create if necessary template partial folder
-            if (!fs.existsSync(this.destinationPath(this.config.twig.src + '/guidelines'))) {
-                fs.mkdirSync(this.destinationPath(this.config.twig.src + '/guidelines'));
-            }
+            folderCreation(this.destinationPath(this.config.twig.src + '/guidelines'));
+            folderCreation(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type));
 
-            if (!fs.existsSync(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type))) {
-                fs.mkdirSync(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type));
+            var content = '';
+            if (this.doGenerate.twig_brick) {
+                content = '{% include \'../../bricks/_' + this.name + '.html.twig\' %}';
             }
-
-            // Create template partial file
-            partialCreation(this.file.twig);
+            partialCreation(this.file.twig, content);
 
             // Generate guideline template import
             partialImport(
@@ -160,6 +160,11 @@ module.exports = generators.Base.extend({
                 '{% endblock ' + this.type + ' %}', // flag
                 this.destinationPath(this.config.twig.src + '/guidelines.html.twig') // path
             );
+        }
+
+        if (this.doGenerate.twig_brick) {
+            folderCreation(this.destinationPath(this.config.twig.src + '/bricks'));
+            partialCreation(this.file.twig_brick);
         }
     },
 });
