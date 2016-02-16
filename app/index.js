@@ -172,6 +172,20 @@ module.exports = generators.Base.extend({
             );
         }
 
+        setTimeout(function() {
+            var scripts = {
+                'make-dev': 'npm install && bower install && gulp',
+                'start-dev': 'gulp watch'
+            };
+
+            var package_str = fs.readFileSync(this.destinationPath('package.json'));
+            var package = JSON.parse(package_str);
+            package.scripts['make-dev'] = 'npm install && bower install && gulp';
+            package.scripts['start-dev'] = 'gulp watch';
+            fs.writeFileSync(this.destinationPath('package.json'), JSON.stringify(package, null, 4));
+        }.bind(this), 500);
+
+
         // Create dotfiles
         // -----------------
         this.fs.copyTpl(
@@ -224,6 +238,7 @@ module.exports = generators.Base.extend({
             'gulp-size',
             'gulp-load-plugins',
             'fs-extra',
+            'run-sequence',
 
             // Gulp sass dependencies
             'gulp-sourcemaps',

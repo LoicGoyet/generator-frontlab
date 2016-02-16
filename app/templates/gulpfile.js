@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var fs = require('fs-extra');
+var runSequence = require('run-sequence');
 <% if (config.serve) { %>var browserSync = require('browser-sync');<% } %>
 <% if (config.serve) { %>var reload = browserSync.reload;<% } %>
 
@@ -52,11 +53,7 @@ gulp.task('styles', function () {
         .pipe($.size({title: 'twig'}));
 });<% } %>
 
-gulp.task('watch', [
-    'styles',
-    <% if (config.twig.compilation) { %>'templates',<% } %>
-    <% if (config.public.enabled) { %>'copy-public',<% } %>
-], function() {
+gulp.task('watch', ['default'], function() {
     var config = getConfig();
 
     <% if (config.serve) { %>browserSync({
@@ -68,4 +65,17 @@ gulp.task('watch', [
     gulp.watch(config.sass.src + '/**/*.{scss, css}', ['styles', <% if (config.serve) { %>reload<% } %>]);
     <% if (config.twig.compilation) { %>gulp.watch(config.twig.src + '/**/*.{html.twig, twig}', ['templates', <% if (config.serve) { %>reload<% } %>]);<% } %>
     <% if (config.public.enabled) { %>gulp.watch(config.public.src + '/public/**/*', ['copy-public', <% if (config.serve) { %>reload<% } %>]);<% } %>
+});
+
+gulp.task('default', function(cb) {
+    runSequence(
+        [
+            'styles',
+            <% if (config.twig.compilation) { %>'templates',<% } %>
+        ],
+        [
+            <% if (config.public.enabled) { %>'copy-public',<% } %>
+        ],
+        cb
+    );
 });
