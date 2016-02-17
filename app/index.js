@@ -2,6 +2,8 @@ var generators = require('yeoman-generator');
 var fs = require('fs-extra');
 var chalk = require('chalk');
 
+var config = require('../helper/config.js')();
+
 module.exports = generators.Base.extend({
     initializing: function() {
         this.log('Welcome to the frontlab generator');
@@ -156,9 +158,7 @@ module.exports = generators.Base.extend({
     },
 
     configuring: function() {
-        this.log(this.config);
-        var config_str = JSON.stringify(this.config, null, 4);
-        fs.writeFileSync(this.destinationPath('frontlab.json'), config_str);
+        config.write(this, this.config);
     },
 
     writing: function() {

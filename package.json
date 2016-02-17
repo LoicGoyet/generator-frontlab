@@ -5,7 +5,9 @@
   "files": [
     "app",
     "router",
-    "create:style"
+    "create:style",
+    "create:page",
+    "helper"
   ],
   "keywords": [
     "yeoman-generator"

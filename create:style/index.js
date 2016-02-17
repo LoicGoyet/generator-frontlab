@@ -2,6 +2,8 @@ var generators = require('yeoman-generator');
 var fs = require('fs-extra');
 var chalk = require('chalk');
 
+var config = require('../helper/config.js')();
+
 var partialCreation = require('./helper/partial-creation.js')();
 var partialImport = require('./helper/partial-import.js')();
 var folderCreation = require('./helper/folder-creation.js')();
@@ -9,15 +11,7 @@ var folderCreation = require('./helper/folder-creation.js')();
 module.exports = generators.Base.extend({
     initializing: function() {
         this.log('Creating style partial');
-        var configExists = fs.existsSync(this.destinationPath('frontlab.json'));
-
-        this.config = null;
-        if (configExists) {
-            var config_str = fs.readFileSync(this.destinationPath('frontlab.json'));
-            this.config = JSON.parse(config_str);
-        } else {
-            this.log(chalk.red('there is no frontlab.json file at the root of your project'));
-        }
+        this.config = config.getJSON(this);
     },
 
     prompting: function() {
