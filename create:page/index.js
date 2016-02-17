@@ -16,7 +16,6 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'name',
                 message: 'What is the name of the page ?',
-                default: 'contact',
                 validate: function(input) {
                     if (typeof input !== 'string' || input.length === 0) {
                         this.log(chalk.red('You must pass a valid string valid !'));
