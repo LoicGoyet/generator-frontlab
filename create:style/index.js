@@ -3,10 +3,9 @@ var fs = require('fs-extra');
 var chalk = require('chalk');
 
 var config = require('../helper/config.js')();
+var partial = require('../helper/partial.js')();
+var folder = require('../helper/folder.js')();
 
-var partialCreation = require('./helper/partial-creation.js')();
-var partialImport = require('./helper/partial-import.js')();
-var folderCreation = require('./helper/folder-creation.js')();
 
 module.exports = generators.Base.extend({
     initializing: function() {
@@ -128,10 +127,10 @@ module.exports = generators.Base.extend({
 
         if (this.doGenerate.scss) {
             // Create scss partial file
-            partialCreation(this.file.scss);
+            partial.create(this.file.scss);
 
             // Import scss partial into main.scss
-            partialImport(
+            partial.import(
                 '@import \'' + this.type + '/' + this.name + '\';\n', // injection
                 '// END ' + this.type, // flag
                 this.destinationPath(this.config.sass.src + '/main.scss') // path
@@ -139,17 +138,17 @@ module.exports = generators.Base.extend({
         }
 
         if (this.doGenerate.twig) {
-            folderCreation(this.destinationPath(this.config.twig.src + '/guidelines'));
-            folderCreation(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type));
+            folder.create(this.destinationPath(this.config.twig.src + '/guidelines'));
+            folder.create(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type));
 
             var content = '';
             if (this.doGenerate.twig_brick) {
                 content = '{% include \'../../bricks/_' + this.name + '.html.twig\' %}';
             }
-            partialCreation(this.file.twig, content);
+            partial.create(this.file.twig, content);
 
             // Generate guideline template import
-            partialImport(
+            partial.import(
                 '    {% include \'guidelines/' + this.type + '/_' + this.name + '.html.twig\' %}\n    ', // injection
                 '{% endblock ' + this.type + ' %}', // flag
                 this.destinationPath(this.config.twig.src + '/guidelines.html.twig') // path
@@ -157,8 +156,8 @@ module.exports = generators.Base.extend({
         }
 
         if (this.doGenerate.twig_brick) {
-            folderCreation(this.destinationPath(this.config.twig.src + '/bricks'));
-            partialCreation(this.file.twig_brick);
+            folder.create(this.destinationPath(this.config.twig.src + '/bricks'));
+            partial.create(this.file.twig_brick);
         }
     },
 });
