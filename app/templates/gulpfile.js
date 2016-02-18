@@ -12,7 +12,7 @@ var getConfig = function() {
 
 gulp.task('styles', function () {
     var config = getConfig();
-    return gulp.src(config.sass.src + '/main.scss')
+    return gulp.src(config.sass_src + '/main.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass({
         precision: 10,
@@ -32,24 +32,24 @@ gulp.task('styles', function () {
         ]
     }))
     .pipe($.sourcemaps.write())
-    .pipe(gulp.dest(config.sass.dest))
+    .pipe(gulp.dest(config.sass_dest))
     .pipe($.size({title: 'styles'}));
 });
 
-<% if (config.public.enabled) { %>gulp.task('copy-public', function() {
+<% if (config.public_enabled) { %>gulp.task('copy-public', function() {
     var config = getConfig();
-    return gulp.src(config.public.src + '/public/**/*', { dot: true })
-        .pipe(gulp.dest(config.public.dest + '/public'))
+    return gulp.src(config.public_src + '/public/**/*', { dot: true })
+        .pipe(gulp.dest(config.public_dest + '/public'))
         .pipe($.size({ title: 'public' }));
 });<% } %>
 
-<% if (config.twig.compilation) { %>gulp.task('templates', function() {
+<% if (config.twig_compilation) { %>gulp.task('templates', function() {
     var config = getConfig();
-    return gulp.src(config.twig.src + '/*.html.twig')
+    return gulp.src(config.twig_src + '/*.html.twig')
         .pipe($.twig())
         .pipe($.extReplace('.html', '.html.html'))
         .pipe($.prettify({ indent_size: 2 }))
-        .pipe(gulp.dest(config.twig.dest))
+        .pipe(gulp.dest(config.twig_dest))
         .pipe($.size({title: 'twig'}));
 });<% } %>
 
@@ -59,22 +59,22 @@ gulp.task('watch', ['default'], function() {
     <% if (config.serve) { %>browserSync({
         notify: false,
         logPrefix: 'FrontLab',
-        server: [config.twig.dest]
+        server: [config.twig_dest]
     });<% } %>
 
-    gulp.watch(config.sass.src + '/**/*.{scss, css}', ['styles', <% if (config.serve) { %>reload<% } %>]);
-    <% if (config.twig.compilation) { %>gulp.watch(config.twig.src + '/**/*.{html.twig, twig}', ['templates', <% if (config.serve) { %>reload<% } %>]);<% } %>
-    <% if (config.public.enabled) { %>gulp.watch(config.public.src + '/public/**/*', ['copy-public', <% if (config.serve) { %>reload<% } %>]);<% } %>
+    gulp.watch(config.sass_src + '/**/*.{scss, css}', ['styles', <% if (config.serve) { %>reload<% } %>]);
+    <% if (config.twig_compilation) { %>gulp.watch(config.twig_src + '/**/*.{html.twig, twig}', ['templates', <% if (config.serve) { %>reload<% } %>]);<% } %>
+    <% if (config.public_enabled) { %>gulp.watch(config.public_src + '/public/**/*', ['copy-public', <% if (config.serve) { %>reload<% } %>]);<% } %>
 });
 
 gulp.task('default', function(cb) {
     runSequence(
         [
             'styles',
-            <% if (config.twig.compilation) { %>'templates',<% } %>
+            <% if (config.twig_compilation) { %>'templates',<% } %>
         ],
         [
-            <% if (config.public.enabled) { %>'copy-public',<% } %>
+            <% if (config.public_enabled) { %>'copy-public',<% } %>
         ],
         cb
     );

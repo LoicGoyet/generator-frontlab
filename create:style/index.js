@@ -106,9 +106,9 @@ module.exports = generators.Base.extend({
 
     configuring: function() {
         this.file = {
-            scss: this.destinationPath(this.config.sass.src + '/' + this.type + '/_' + this.name + '.scss'),
-            twig: this.destinationPath(this.config.twig.src + '/guidelines/' + this.type + '/_' + this.name + '.html.twig'),
-            twig_brick: this.destinationPath(this.config.twig.src + '/bricks/_' + this.name + '.html.twig'),
+            scss: this.destinationPath(this.config.sass_src + '/' + this.type + '/_' + this.name + '.scss'),
+            twig: this.destinationPath(this.config.twig_src + '/guidelines/' + this.type + '/_' + this.name + '.html.twig'),
+            twig_brick: this.destinationPath(this.config.twig_src + '/bricks/_' + this.name + '.html.twig'),
         };
         this.doGenerate = {
             scss: !fs.existsSync(this.file.scss),
@@ -132,13 +132,13 @@ module.exports = generators.Base.extend({
             partial.import(
                 '@import \'' + this.type + '/' + this.name + '\';\n', // injection
                 '// END ' + this.type, // flag
-                this.destinationPath(this.config.sass.src + '/main.scss') // path
+                this.destinationPath(this.config.sass_src + '/main.scss') // path
             );
         }
 
         if (this.doGenerate.twig) {
-            folder.create(this.destinationPath(this.config.twig.src + '/guidelines'));
-            folder.create(this.destinationPath(this.config.twig.src + '/guidelines/' + this.type));
+            folder.create(this.destinationPath(this.config.twig_src + '/guidelines'));
+            folder.create(this.destinationPath(this.config.twig_src + '/guidelines/' + this.type));
 
             var content = '';
             if (this.doGenerate.twig_brick) {
@@ -150,12 +150,12 @@ module.exports = generators.Base.extend({
             partial.import(
                 '    {% include \'guidelines/' + this.type + '/_' + this.name + '.html.twig\' %}\n    ', // injection
                 '{% endblock ' + this.type + ' %}', // flag
-                this.destinationPath(this.config.twig.src + '/guidelines.html.twig') // path
+                this.destinationPath(this.config.twig_src + '/guidelines.html.twig') // path
             );
         }
 
         if (this.doGenerate.twig_brick) {
-            folder.create(this.destinationPath(this.config.twig.src + '/bricks'));
+            folder.create(this.destinationPath(this.config.twig_src + '/bricks'));
             partial.create(this.file.twig_brick);
         }
     },

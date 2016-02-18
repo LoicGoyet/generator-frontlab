@@ -33,14 +33,14 @@ module.exports = generators.Base.extend({
     writing: function() {
         // Twig
         var twig_content = '{% extends \'layout/_layout.html.twig\' %}\n\n{% block content %}\n    <h1>Hello ' + this.name + ' !</h1>\n{% endblock content %}\n';
-        partial.create(this.destinationPath(this.config.twig.src + '/' + this.name + '.html.twig'), twig_content);
+        partial.create(this.destinationPath(this.config.twig_src + '/' + this.name + '.html.twig'), twig_content);
 
         // Sass
-        partial.create(this.destinationPath(this.config.sass.src + '/pages/_' + this.name + '.scss'));
+        partial.create(this.destinationPath(this.config.sass_src + '/pages/_' + this.name + '.scss'));
         partial.import(
             '@import \'pages/' + this.name + '\';\n', // injection
             '// END pages', // flag
-            this.destinationPath(this.config.sass.src + '/main.scss') // path
+            this.destinationPath(this.config.sass_src + '/main.scss') // path
         );
     },
 });

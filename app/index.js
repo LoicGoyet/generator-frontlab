@@ -8,20 +8,14 @@ module.exports = generators.Base.extend({
     initializing: function() {
         this.log('Welcome to the frontlab generator');
         this.config = {
-            sass: {
-                src: '',
-                dest: '',
-            },
-            twig: {
-                enabled: '',
-                compilation: '',
-            },
-            public: {
-                enabled: '',
-                src: '',
-                dest: '',
-            },
-            serve: false,
+            sass_src: null,
+            sass_dest: null,
+            twig_enabled: null,
+            twig_compilation: null,
+            public_enabled: null,
+            public_src: null,
+            public_dest: null,
+            serve: null,
         };
     },
 
@@ -137,22 +131,22 @@ module.exports = generators.Base.extend({
             },
         ], function(answers) {
             // Sass anwsers
-            this.config.sass.src = answers.sass_src + '/style';
-            this.config.sass.dest = answers.sass_dest;
+            this.config.sass_src = answers.sass_src + '/style';
+            this.config.sass_dest = answers.sass_dest;
 
             // Twig anwsers
-            this.config.twig.enabled = answers.twig_enabled;
-            this.config.twig.src = answers.twig_enabled ? answers.twig_src + '/templates' : false;
-            this.config.twig.compilation = answers.twig_enabled ? answers.twig_compilation : false;
-            this.config.twig.dest = answers.twig_enabled && this.config.twig.compilation ? answers.twig_dest : false;
+            this.config.twig_enabled = answers.twig_enabled;
+            this.config.twig_src = answers.twig_enabled ? answers.twig_src + '/templates' : false;
+            this.config.twig_compilation = answers.twig_enabled ? answers.twig_compilation : false;
+            this.config.twig_dest = answers.twig_enabled && this.config.twig_compilation ? answers.twig_dest : false;
+
+            // Copy
+            this.config.public_enabled = answers.public_enabled;
+            this.config.public_src = answers.public_src ? answers.public_src : false;
+            this.config.public_dest = answers.public_dest ? answers.public_dest : false;
 
             // Server
             this.config.serve = answers.serve ? answers.serve : false;
-
-            // Copy
-            this.config.public.enabled = answers.public_enabled;
-            this.config.public.src = answers.public_src ? answers.public_src : false;
-            this.config.public.dest = answers.public_dest ? answers.public_dest : false;
             done();
         }.bind(this));
     },
@@ -210,24 +204,24 @@ module.exports = generators.Base.extend({
         // -----------------
         this.fs.copyTpl(
             this.templatePath('sass'),
-            this.destinationPath(this.config.sass.src)
+            this.destinationPath(this.config.sass_src)
         );
 
         // Create twig files
         // -----------------
-        if (this.config.twig.enabled) {
+        if (this.config.twig_enabled) {
             this.fs.copyTpl(
                 this.templatePath('templates'),
-                this.destinationPath(this.config.twig.src)
+                this.destinationPath(this.config.twig_src)
             );
         }
 
         // Create public folder
         // --------------------
-        if (this.config.public.enabled) {
+        if (this.config.public_enabled) {
             this.fs.copyTpl(
                 this.templatePath('public'),
-                this.destinationPath(this.config.public.src + '/public')
+                this.destinationPath(this.config.public_src + '/public')
             );
         }
     },
@@ -247,7 +241,7 @@ module.exports = generators.Base.extend({
         ];
 
         // Gulp twig dependencies
-        if (this.config.twig.compilation) {
+        if (this.config.twig_compilation) {
             devDependencies.push(
                 'gulp-twig',
                 'gulp-ext-replace',
