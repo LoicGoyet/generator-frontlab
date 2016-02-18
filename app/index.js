@@ -169,7 +169,7 @@ module.exports = generators.Base.extend({
         setTimeout(function() {
             var scripts = {
                 'make-dev': 'npm install && bower install && gulp',
-                'start-dev': 'gulp watch'
+                'start': 'gulp watch'
             };
 
             var package_str = fs.readFileSync(this.destinationPath('package.json'));
