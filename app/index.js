@@ -10,12 +10,21 @@ module.exports = generators.Base.extend({
         this.config = {
             sass_src: null,
             sass_dest: null,
+
             twig_enabled: null,
+            twig_src: null,
             twig_compilation: null,
+            twig_dest: null,
+
             public_enabled: null,
             public_src: null,
             public_dest: null,
             serve: null,
+        };
+
+        this.default = {
+            src: 'src',
+            dest: 'dest',
         };
     },
 
@@ -28,13 +37,25 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'sass_src',
                 message: 'Where do you want to generate the sass architecture ?',
-                default: 'src'
+                default: function() {
+                    return this.default.src;
+                }.bind(this),
+                filter: function(input) {
+                    this.default.src = input;
+                    return input + '/style';
+                }.bind(this),
             },
             {
                 type: 'input',
                 name: 'sass_dest',
                 message: 'Where will be generated the sass files ?',
-                default: 'dest'
+                default: function() {
+                    return this.default.dest;
+                }.bind(this),
+                filter: function(input) {
+                    this.default.dest = input;
+                    return input;
+                }.bind(this),
             },
 
             // Twig prompts
@@ -49,9 +70,9 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'twig_src',
                 message: 'Where do you want to generate the twig architecture ?',
-                default: function(answers) {
-                    return answers.sass_src;
-                },
+                default: function() {
+                    return this.default.src;
+                }.bind(this),
                 when: function(answers) {
                     return answers.twig_enabled;
                 },
@@ -60,8 +81,10 @@ module.exports = generators.Base.extend({
                         this.log(chalk.red('You must pass a valid string valid !'));
                         return false;
                     }
-
                     return true;
+                }.bind(this),
+                filter: function(input) {
+                    return input + '/templates';
                 }.bind(this),
             },
             {
@@ -77,9 +100,9 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'twig_dest',
                 message: 'Where will be generated the html files after compilation ?',
-                default: function(answers) {
-                    return answers.sass_dest;
-                },
+                default: function() {
+                    return this.default.dest;
+                }.bind(this),
                 when: function(answers) {
                     return answers.twig_enabled && answers.twig_compilation;
                 },
@@ -92,15 +115,9 @@ module.exports = generators.Base.extend({
                     return true;
                 }.bind(this),
             },
-            {
-                type: 'confirm',
-                name: 'serve',
-                message: 'Do you need a gulp task for having a localserver ?',
-                when: function(answers) {
-                    return answers.twig_compilation;
-                },
-                default: true,
-            },
+
+            // Public prompts
+            // --------------
             {
                 type: 'confirm',
                 name: 'public_enabled',
@@ -114,9 +131,10 @@ module.exports = generators.Base.extend({
                 when: function(answers) {
                     return answers.public_enabled;
                 },
-                default: function(answers) {
-                    return answers.sass_src;
-                },
+                default: function() {
+                    return this.default.src;
+                }.bind(this),
+
             },
             {
                 type: 'input',
@@ -125,28 +143,26 @@ module.exports = generators.Base.extend({
                 when: function(answers) {
                     return answers.public_enabled;
                 },
-                default: function(answers) {
-                    return answers.sass_dest;
+                default: function() {
+                    return this.default.dest;
+                }.bind(this),
+            },
+
+            // Server prompt
+            // -------------
+            {
+                type: 'confirm',
+                name: 'serve',
+                message: 'Do you need a gulp task for having a localserver ?',
+                when: function(answers) {
+                    return answers.twig_compilation || answers.public_enabled;
                 },
+                default: true,
             },
         ], function(answers) {
-            // Sass anwsers
-            this.config.sass_src = answers.sass_src + '/style';
-            this.config.sass_dest = answers.sass_dest;
-
-            // Twig anwsers
-            this.config.twig_enabled = answers.twig_enabled;
-            this.config.twig_src = answers.twig_enabled ? answers.twig_src + '/templates' : false;
-            this.config.twig_compilation = answers.twig_enabled ? answers.twig_compilation : false;
-            this.config.twig_dest = answers.twig_enabled && this.config.twig_compilation ? answers.twig_dest : false;
-
-            // Copy
-            this.config.public_enabled = answers.public_enabled;
-            this.config.public_src = answers.public_src ? answers.public_src : false;
-            this.config.public_dest = answers.public_dest ? answers.public_dest : false;
-
-            // Server
-            this.config.serve = answers.serve ? answers.serve : false;
+            for (var key in answers) {
+                this.config[key] = answers[key];
+            }
             done();
         }.bind(this));
     },
