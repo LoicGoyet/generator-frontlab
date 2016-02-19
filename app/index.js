@@ -157,26 +157,15 @@ module.exports = generators.Base.extend({
 
     writing: {
         writingPackageJSON: function() {
-            var packageExists = fs.existsSync(this.destinationPath('package.json'));
-            if (!packageExists) {
-                this.fs.copyTpl(
-                    this.templatePath('package.json'),
-                    this.destinationPath('package.json')
-                );
-            }
-
-            setTimeout(function() {
-                var scripts = {
-                    'make-dev': 'npm install && bower install && gulp',
-                    'start': 'gulp watch'
-                };
-
-                var package_str = fs.readFileSync(this.destinationPath('package.json'));
-                var package = JSON.parse(package_str);
-                package.scripts['make-dev'] = 'npm install && bower install && gulp';
-                package.scripts['start-dev'] = 'gulp watch';
-                fs.writeFileSync(this.destinationPath('package.json'), JSON.stringify(package, null, 4));
-            }.bind(this), 500);
+            fs.stat(this.destinationPath('package.json'), function(err, stats) {
+                var packageExists = err === null && stats.isFile();
+                if (!packageExists) {
+                    this.fs.copyTpl(
+                        this.templatePath('package.json'),
+                        this.destinationPath('package.json')
+                    );
+                }
+            }.bind(this));
         },
 
         writingDotfiles: function() {
