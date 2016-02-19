@@ -5,26 +5,29 @@ var config = require('../helper/config.js')();
 
 
 module.exports = generators.Base.extend({
+    constructor: function() {
+        generators.Base.apply(this, arguments);
+
+        /**
+         * @model: '{"sass_src":"test"}'
+         */
+        this.argument('config', {
+            required: false,
+            desc: '\nA string that will be JSON parse to init the config and avoid prompts\nexample : \'{"sass_src":"test"}\'',
+        });
+
+        if (this.config) {
+            this.config = JSON.parse(this.config);
+        } else {
+            this.config = {};
+        }
+    },
+
     initializing: function() {
         this.log('Welcome to the frontlab generator');
-        this.config = {
-            sass_src: null,
-            sass_dest: null,
-
-            twig_enabled: null,
-            twig_src: null,
-            twig_compilation: null,
-            twig_dest: null,
-
-            public_enabled: null,
-            public_src: null,
-            public_dest: null,
-            serve: null,
-        };
-
         this.default = {
-            src: 'src',
-            dest: 'dest',
+            src: this.config.sass_src ? this.config.sass_src : 'src',
+            dest: this.config.sass_dest ? this.config.sass_dest : 'dest',
         };
     },
 
@@ -40,6 +43,9 @@ module.exports = generators.Base.extend({
                 default: function() {
                     return this.default.src;
                 }.bind(this),
+                when: function(answers) {
+                    return !this.config.sass_src;
+                }.bind(this),
                 filter: function(input) {
                     this.default.src = input;
                     return input + '/style';
@@ -49,6 +55,9 @@ module.exports = generators.Base.extend({
                 type: 'input',
                 name: 'sass_dest',
                 message: 'Where will be generated the sass files ?',
+                when: function(answers) {
+                    return !this.config.sass_dest;
+                }.bind(this),
                 default: function() {
                     return this.default.dest;
                 }.bind(this),
@@ -64,7 +73,10 @@ module.exports = generators.Base.extend({
                 type: 'confirm',
                 name: 'twig_enabled',
                 message: 'Do you want to generate twig architecture for faster GUI ?',
-                default: 'true'
+                default: 'true',
+                when: function(answers) {
+                    return !this.config.twig_enabled;
+                }.bind(this),
             },
             {
                 type: 'input',
@@ -74,8 +86,8 @@ module.exports = generators.Base.extend({
                     return this.default.src;
                 }.bind(this),
                 when: function(answers) {
-                    return answers.twig_enabled;
-                },
+                    return (answers.twig_enabled || this.config.twig_enabled) && !this.config.twig_src;
+                }.bind(this),
                 validate: function(input) {
                     if (typeof input !== 'string' || input.length === 0) {
                         this.log(chalk.red('You must pass a valid string valid !'));
@@ -93,8 +105,8 @@ module.exports = generators.Base.extend({
                 message: 'Do you want a gulp task that will compile your twig files ?',
                 default: 'true',
                 when: function(answers) {
-                    return answers.twig_enabled;
-                },
+                    return (answers.twig_enabled || this.config.twig_enabled) && !this.config.twig_compilation;
+                }.bind(this),
             },
             {
                 type: 'input',
@@ -104,8 +116,8 @@ module.exports = generators.Base.extend({
                     return this.default.dest;
                 }.bind(this),
                 when: function(answers) {
-                    return answers.twig_enabled && answers.twig_compilation;
-                },
+                    return ((answers.twig_enabled || this.config.twig_enabled) && (answers.twig_compilation || this.config.twig_compilation)) && !this.config.twig_dest;
+                }.bind(this),
                 validate: function(input) {
                     if (typeof input !== 'string' || input.length === 0) {
                         this.log(chalk.red('You must pass a valid string valid !'));
@@ -123,26 +135,28 @@ module.exports = generators.Base.extend({
                 name: 'public_enabled',
                 message: 'Do you want to generate a \'public\' folder (usefull for copy all files without transformation)',
                 default: true,
+                when: function(answers) {
+                    return !this.config.public_enabled;
+                }.bind(this),
             },
             {
                 type: 'input',
                 name: 'public_src',
                 message: 'Where do you want to generate the \'public\' folder ?',
                 when: function(answers) {
-                    return answers.public_enabled;
-                },
+                    return (answers.public_enabled || this.config.public_enabled) && !this.config.public_src;
+                }.bind(this),
                 default: function() {
                     return this.default.src;
                 }.bind(this),
-
             },
             {
                 type: 'input',
                 name: 'public_dest',
                 message: 'Where do you want to copy the \'public\' folder ?',
                 when: function(answers) {
-                    return answers.public_enabled;
-                },
+                    return answers.public_enabled && !this.config.public_dest;
+                }.bind(this),
                 default: function() {
                     return this.default.dest;
                 }.bind(this),
@@ -155,8 +169,8 @@ module.exports = generators.Base.extend({
                 name: 'serve',
                 message: 'Do you need a gulp task for having a localserver ?',
                 when: function(answers) {
-                    return answers.twig_compilation || answers.public_enabled;
-                },
+                    return (answers.twig_compilation || answers.public_enabled) && !this.config.serve;
+                }.bind(this),
                 default: true,
             },
         ], function(answers) {
