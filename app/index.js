@@ -252,6 +252,7 @@ module.exports = generators.Base.extend({
                 'gulp-load-plugins',
                 'fs-extra',
                 'run-sequence',
+                'av-gulp-injector',
 
                 // Gulp sass dependencies
                 'gulp-sourcemaps',

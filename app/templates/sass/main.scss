@@ -4,6 +4,10 @@
  * Configuration and helpers
  */
 @import 'utils/variables';
+
+/* styleutils:scss */
+/* endinject */
+
 @import 'utils/functions';
 @import 'utils/mixins';
 // END utils
@@ -11,6 +15,11 @@
 /**
  * Vendors
  */
+/* stylevendors:scss */
+/* endinject */
+
+/* stylevendors:css */
+/* endinject */
 // END vendors
 
 /**

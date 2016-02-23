@@ -4,6 +4,7 @@ var fs = require('fs-extra');
 var runSequence = require('run-sequence');
 <% if (config.serve) { %>var browserSync = require('browser-sync');<% } %>
 <% if (config.serve) { %>var reload = browserSync.reload;<% } %>
+var avInjector = require('av-gulp-injector');
 
 var getConfig = function() {
     var config_str = fs.readFileSync('frontlab.json');
@@ -67,15 +68,24 @@ gulp.task('watch', ['default'], function() {
     <% if (config.public_enabled) { %>gulp.watch(config.public_src + '/public/**/*', ['copy-public', <% if (config.serve) { %>reload<% } %>]);<% } %>
 });
 
+gulp.task('injector', function() {
+    var config = getConfig();
+
+    var injectorAliases = {
+        '@bower': config.public_src + '/public/bower_components',
+    };
+
+    avInjector.injector(gulp.src([
+        config.sass_src + '/**/*.scss',
+        <% if (config.twig_compilation) { %>config.twig_dest + '/**/*.html',<% } %>
+    ]), injectorAliases, true);
+});
+
 gulp.task('default', function(cb) {
     runSequence(
-        [
-            'styles',
-            <% if (config.twig_compilation) { %>'templates',<% } %>
-        ],
-        [
-            <% if (config.public_enabled) { %>'copy-public',<% } %>
-        ],
+        ['injector'],
+        ['styles', <% if (config.twig_compilation) { %>'templates',<% } %>],
+        [<% if (config.public_enabled) { %>'copy-public',<% } %>],
         cb
     );
 });
