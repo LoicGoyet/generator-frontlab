@@ -1,0 +1,11 @@
+{
+  "name": "frontlab",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "<%= config.public_src %>/public/bower_components",
+    "test",
+    "tests"
+  ]
+}

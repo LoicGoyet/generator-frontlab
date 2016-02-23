@@ -218,6 +218,20 @@ module.exports = generators.Base.extend({
             );
         },
 
+        writingBowerfiles: function() {
+            this.fs.copyTpl(
+                this.templatePath('_bowerrc'),
+                this.destinationPath('.bowerrc'),
+                { config: this.config }
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('bower.json'),
+                this.destinationPath('bower.json'),
+                { config: this.config }
+            );
+        },
+
         writingSassArchitecture: function() {
             this.fs.copyTpl(
                 this.templatePath('sass'),
