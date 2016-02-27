@@ -26,7 +26,10 @@ gulp.task('styles', function () {
     return gulp.src(config.sass_src + '/main.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass({
-        precision: 10,
+        precision: 6,
+        outputStyle: 'expanded',
+        sourceComments: true,
+        indentWidth: 4,
     }))
     .on('error', report_error)
     .pipe($.autoprefixer({
