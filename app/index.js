@@ -263,6 +263,7 @@ module.exports = generators.Base.extend({
             this.devDependencies = [
                 'gulp',
                 'gulp-size',
+                'gulp-notify',
                 'gulp-load-plugins',
                 'fs-extra',
                 'run-sequence',

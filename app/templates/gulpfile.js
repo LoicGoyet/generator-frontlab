@@ -6,19 +6,29 @@ var runSequence = require('run-sequence');
 <% if (config.serve) { %>var reload = browserSync.reload;<% } %>
 var avInjector = require('av-gulp-injector');
 
-var getConfig = function() {
+var get_config = function() {
     var config_str = fs.readFileSync('frontlab.json');
     return JSON.parse(config_str);
 };
 
+var report_error = function(error) {
+    $.notify({
+        title: 'An error occured with a Gulp task',
+        message: 'Check you terminal for more informations'
+    }).write(error);
+
+    console.log(error.toString());
+    this.emit('end');
+};
+
 gulp.task('styles', function () {
-    var config = getConfig();
+    var config = get_config();
     return gulp.src(config.sass_src + '/main.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass({
         precision: 10,
-        onError: console.error.bind(console, 'Sass error:')
     }))
+    .on('error', report_error)
     .pipe($.autoprefixer({
         browsers: [
             'ie >= 10',
@@ -38,14 +48,14 @@ gulp.task('styles', function () {
 });
 
 <% if (config.public_enabled) { %>gulp.task('copy-public', function() {
-    var config = getConfig();
+    var config = get_config();
     return gulp.src(config.public_src + '/public/**/*', { dot: true })
         .pipe(gulp.dest(config.public_dest + '/public'))
         .pipe($.size({ title: 'public' }));
 });<% } %>
 
 <% if (config.twig_compilation) { %>gulp.task('templates', function() {
-    var config = getConfig();
+    var config = get_config();
     return gulp.src(config.twig_src + '/*.html.twig')
         .pipe($.twig())
         .pipe($.extReplace('.html', '.html.html'))
@@ -55,7 +65,7 @@ gulp.task('styles', function () {
 });<% } %>
 
 gulp.task('watch', ['default'], function() {
-    var config = getConfig();
+    var config = get_config();
 
     <% if (config.serve) { %>browserSync({
         notify: false,
@@ -69,7 +79,7 @@ gulp.task('watch', ['default'], function() {
 });
 
 gulp.task('injector', function() {
-    var config = getConfig();
+    var config = get_config();
 
     var injectorAliases = {
         '@bower': config.public_src + '/public/bower_components',
