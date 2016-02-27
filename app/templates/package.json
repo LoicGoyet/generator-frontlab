@@ -7,6 +7,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "make-dev": "npm install && bower install && gulp",
+        "prestart": "npm run make-dev",
         "start": "gulp watch"
     },
     "license": "ISC"
