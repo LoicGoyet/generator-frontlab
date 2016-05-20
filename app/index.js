@@ -73,7 +73,7 @@ module.exports = generators.Base.extend({
                 type: 'confirm',
                 name: 'twig_enabled',
                 message: 'Do you want to generate twig architecture for faster GUI ?',
-                default: 'true',
+                default: true,
                 when: function(answers) {
                     return !this.config.twig_enabled;
                 }.bind(this),
