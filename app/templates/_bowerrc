@@ -1,6 +1,0 @@
-{
-    "directory": "<%= config.public_src %>/public/bower_components",
-    "scripts": {
-        "postinstall": "gulp injector"
-    }
-}

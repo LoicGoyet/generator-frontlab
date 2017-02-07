@@ -31,3 +31,9 @@
     @content;
   }
 }
+
+@mixin when-tag($tag) {
+  @at-root #{$tag}#{&} {
+    @content;
+  }
+}

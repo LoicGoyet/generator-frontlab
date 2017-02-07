@@ -1,0 +1,49 @@
+@charset 'UTF-8';
+
+$trowel-config: (
+  'synthax': (
+    'separator': (
+      'prefix': '-',
+      'element': '__',
+      'modifier': '--',
+    ),
+  ),
+  'breakpoints': (
+    'xs': ('max': 767px),
+    'sm': ('min': 768px, 'max': 991px),
+    'md': ('min': 992px, 'max': 1199px),
+    'lg': ('min': 1200px),
+  ),
+);
+
+/**
+ * Configuration and helpers
+ */
+@import 'utils/*';
+@import '../public/bower_components/trowel-core/src/trowel';
+
+
+/**
+ * Base stuff
+ */
+@import 'base/*';
+
+
+/**
+* Vendors
+*/
+
+
+/**
+* Components
+*/
+
+
+/**
+ * Layout-related sections
+ */
+
+
+/**
+ * Page-specific styles
+ */

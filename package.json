@@ -5,8 +5,6 @@
   "files": [
     "app",
     "router",
-    "create:style",
-    "create:page",
     "helper"
   ],
   "keywords": [

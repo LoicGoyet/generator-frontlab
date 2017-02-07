@@ -1,0 +1,10 @@
+{
+    "name": "generated",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "make": "yarn install && bower install && gulp",
+        "prestart": "npm run make",
+        "start": "gulp watch"
+    },
+    "license": "ISC"
+}
